@@ -1,8 +1,29 @@
+*{
+  box-sizing: border-box;
+  outline: none;
+}
+
+input:focus, button:focus {
+  outline: none !important;
+  box-shadow: none !important; /* às vezes tem sombra azul também */
+}
+
+/* Remove setas no Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove setas no Firefox */
+input[type=number] {
+   appearance: textfield;
+  -moz-appearance: textfield;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: Public Sans,sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -10,4 +31,109 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.custom-card{
+  border-color: rgb(235, 235, 235)!important;
+  box-shadow: 0;
+}
+
+.content-header{
+  border-bottom:  1px solid rgb(221, 221, 221);
+  
+ 
+}
+
+
+
+.title{
+  text-transform: uppercase;
+  font-weight: 800;
+  line-height: 1.4;
+  color: #4d83f0;
+  margin-top: 60px;
+}
+
+.sub-title{
+  font-weight: 600;
+  line-height: 1.4;
+  color: #555555;
+  margin-top: 60px;
+}
+label, .lbl{
+  margin-bottom: 5px;
+  color:#555555 !important;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+
+.btn-primary, .btn-outline-secondary{
+  background-color: #7089e7  !important;
+  border-color: #7089e7  !important;
+  color: white !important;
+
+}
+
+.input-group-text{
+  background-color: #7089e7  !important;
+  border-color: #7089e7  !important;
+  color: white !important;
+}
+
+.data{
+  color: #6985ea !important;
+  line-height: 20px !important;
+}
+
+.fs-5-5 {
+  font-size: 1.2rem; /* ajuste entre fs-5 (1.25rem) e fs-6 (1rem) */
+}
+
+
+.my-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 0.5rem; /* cantos semi arredondados */
+  overflow: hidden;
+  background-color: #fff; /* fundo branco */
+  border: solid 1px rgb(235, 235, 235)!important;
+  box-shadow: 0;
+}
+
+.table th {
+  margin-bottom: 5px;
+  color:#6985ea !important;
+  font-weight: 600;
+  text-transform: capitalize;
+  font-size: 1.1em !important;
+}
+tbody td{
+  color:#555555 !important;
+  white-space: nowrap !important; 
+  
+}
+
+
+
+.circle-date{
+ background-color: #eee  !important;
+ border-radius: 20px !important;
+ padding: 8px !important;
+ font-size: 0.8em !important;
+ padding-left: 10px !important;
+ padding-right: 10px !important;
+ color: #333;
+}
+
+.bg-success, .bg-danger{
+  border-radius: 20px !important;
+  padding: 8px !important;
+   padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.btn-example{
+  margin-top: 20px !important;
+  margin-bottom: 60px !important;
 }

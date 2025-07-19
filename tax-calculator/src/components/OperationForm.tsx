@@ -6,6 +6,7 @@ interface Props {
 }
 
 const FormOperacao: React.FC<Props> = ({ onAdd }) => {
+  // Estados controlados para cada campo
   const [data, setData] = useState('');
   const [tipo, setTipo] = useState<'compra' | 'venda'>('compra');
   const [ticker, setTicker] = useState('');
@@ -13,6 +14,7 @@ const FormOperacao: React.FC<Props> = ({ onAdd }) => {
   const [quantidade, setQuantidade] = useState('');
   const [taxaCorretagem, setTaxaCorretagem] = useState('');
 
+  // Envio do formulário
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!data || !ticker || !preco || !quantidade || !taxaCorretagem) {
@@ -29,7 +31,6 @@ const FormOperacao: React.FC<Props> = ({ onAdd }) => {
       taxaCorretagem: Number(taxaCorretagem),
     });
 
-    // limpar campos
     setData('');
     setPreco('');
     setQuantidade('');
@@ -37,41 +38,122 @@ const FormOperacao: React.FC<Props> = ({ onAdd }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="mb-3">
-        <label>Data da operação</label>
-        <input type="date" className="form-control" value={data} onChange={e => setData(e.target.value)} />
+    <form onSubmit={handleSubmit} className="row g-4">
+      {/* Data da operação */}
+      <div className="col-6">
+        <label className="form-label">Data</label>
+        <input
+          type="date"
+          className="form-control"
+          value={data}
+          onChange={e => setData(e.target.value)}
+        />
       </div>
 
-      <div className="mb-3">
-        <label>Tipo</label>
-        <select className="form-select" value={tipo} onChange={e => setTipo(e.target.value as 'compra' | 'venda')}>
-          <option value="compra">Compra</option>
-          <option value="venda">Venda</option>
-        </select>
+      {/* Tipo da operação */}
+      <div className="col-6">
+        <label className="form-label">Tipo</label>
+        <div className="btn-group w-100">
+          <input
+            type="radio"
+            className="btn-check"
+            id="tipo-compra"
+            checked={tipo === 'compra'}
+            onChange={() => setTipo('compra')}
+          />
+          <label className={`btn btn ${tipo === 'compra' ? 'btn-primary' : 'btn-outline-primary'}`} htmlFor="tipo-compra">
+            Compra
+          </label>
+
+          <input
+            type="radio"
+            className="btn-check"
+            id="tipo-venda"
+            checked={tipo === 'venda'}
+            onChange={() => setTipo('venda')}
+          />
+          <label className={`btn btn ${tipo === 'venda' ? 'btn-primary' : 'btn-outline-primary'}`} htmlFor="tipo-venda">
+            Venda
+          </label>
+        </div>
       </div>
 
-      <div className="mb-3">
-        <label>Ticker (ex: PETR4)</label>
-        <input type="text" className="form-control" value={ticker} onChange={e => setTicker(e.target.value)} />
+      {/* Ticker */}
+      <div className="col-6">
+        <label className="form-label">Nome da Ação</label>
+        <input
+          type="text"
+          className="form-control"
+          value={ticker}
+          onChange={e => setTicker(e.target.value)}
+        />
       </div>
 
-      <div className="mb-3">
-        <label>Preço da ação</label>
-        <input type="number" step="0.01" className="form-control" value={preco} onChange={e => setPreco(e.target.value)} />
+      {/* Preço da ação */}
+      <div className="col-6">
+        <label className="form-label">Preço</label>
+        <div className="input-group">
+          <span className="input-group-text">R$</span>
+          <input
+            type="number"
+            className="form-control"
+            step="0.01"
+            min="0"
+            value={preco}
+            onChange={e => setPreco(e.target.value)}
+          />
+        </div>
       </div>
 
-      <div className="mb-3">
-        <label>Quantidade</label>
-        <input type="number" className="form-control" value={quantidade} onChange={e => setQuantidade(e.target.value)} />
+      {/* Quantidade */}
+      <div className="col-6">
+        <label className="form-label">Quantidade</label>
+        <div className="input-group">
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={() => setQuantidade(prev => (Number(prev) > 0 ? String(Number(prev) - 1) : '0'))}
+          >
+            –
+          </button>
+          <input
+            type="number"
+            className="form-control text-center"
+            value={quantidade}
+            onChange={e => setQuantidade(e.target.value)}
+            min="0"
+          />
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={() => setQuantidade(prev => String(Number(prev || '0') + 1))}
+          >
+            +
+          </button>
+        </div>
       </div>
 
-      <div className="mb-3">
-        <label>Taxa de corretagem</label>
-        <input type="number" step="0.01" className="form-control" value={taxaCorretagem} onChange={e => setTaxaCorretagem(e.target.value)} />
+      {/* Taxa de corretagem */}
+      <div className="col-6">
+        <label className="form-label">Taxa Corretagem</label>
+        <div className="input-group">
+          <span className="input-group-text">R$</span>
+          <input
+            type="number"
+            step="0.01"
+            className="form-control"
+            value={taxaCorretagem}
+            onChange={e => setTaxaCorretagem(e.target.value)}
+          />
+        </div>
       </div>
 
-      <button type="submit" className="btn btn-primary">Adicionar operação</button>
+      {/* Botão de envio */}
+      <div className="col-12 text-end">
+        <button type="submit" className="btn btn-primary btn">
+          Adicionar
+        </button>
+      </div>
     </form>
   );
 };
