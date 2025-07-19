@@ -8,6 +8,11 @@ input:focus, button:focus {
   box-shadow: none !important; /* às vezes tem sombra azul também */
 }
 
+input[type="date"]:focus {
+  outline: 2px solid #f1f1f1;
+  box-shadow: 0 0 5px #f1f1f14f;
+}
+
 /* Remove setas no Chrome, Safari, Edge, Opera */
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
@@ -44,6 +49,9 @@ code {
  
 }
 
+.alert-card{
+margin-bottom: 30px !important;
+} 
 
 
 .title{
@@ -135,5 +143,4 @@ tbody td{
 
 .btn-example{
   margin-top: 20px !important;
-  margin-bottom: 60px !important;
 }
