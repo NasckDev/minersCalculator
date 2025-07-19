@@ -54,17 +54,17 @@ function IRCombinedChart({ resultados }: { resultados: any[] }) {
         borderRadius: 6,
         datalabels: {
           anchor: 'end' as const,
-          align: 'end' as const, // <- aqui a correção
+          align: 'end' as const,
           color: '#4d83f0',
-          font: { size: 11, weight: 'bold' as const },
-          formatter: (value: number) => formatarBRL(value),
+          font: { size: 10, weight: 'bold' as const },
+          formatter: (value: number) => (value > 0 ? formatarBRL(value) : ''),
         },
       },
       {
         type: 'line' as const,
         label: 'IR Acumulado',
         data: irAcumulado,
-        borderColor: '#ff6384',
+        borderColor: '#fa5378',
         backgroundColor: 'rgba(255, 99, 132, 0.2)',
         fill: false,
         tension: 0.3,
@@ -76,6 +76,7 @@ function IRCombinedChart({ resultados }: { resultados: any[] }) {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top' as const,
@@ -103,7 +104,8 @@ function IRCombinedChart({ resultados }: { resultados: any[] }) {
         beginAtZero: true,
         ticks: {
           callback: function (tickValue: string | number) {
-            const valueNum = typeof tickValue === 'string' ? parseFloat(tickValue) : tickValue;
+            const valueNum =
+              typeof tickValue === 'string' ? parseFloat(tickValue) : tickValue;
             return formatarBRL(valueNum);
           },
           color: '#555',
@@ -112,14 +114,24 @@ function IRCombinedChart({ resultados }: { resultados: any[] }) {
         grid: { color: 'rgba(0,0,0,0.05)' },
       },
       x: {
-        ticks: { color: '#555', font: { size: 12 } },
+        ticks: {
+          autoSkip: true,
+          maxTicksLimit: 6,
+          maxRotation: 0,
+          minRotation: 0,
+          color: '#555',
+          font: { size: 11 },
+        },
         grid: { color: 'rgba(0,0,0,0.05)' },
       },
     },
   };
 
   return (
-    <div className="card p-3 shadow-sm" style={{ backgroundColor: '#fff' }}>
+    <div
+      className="card p-3 shadow-sm chart-container"
+      style={{ backgroundColor: '#fff', minHeight: '350px' }}
+    >
       <Chart type="bar" data={data} options={options} />
     </div>
   );

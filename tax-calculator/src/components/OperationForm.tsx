@@ -135,7 +135,7 @@ const FormOperacao: React.FC<Props> = ({ onAdd }) => {
 
       {/* Taxa de corretagem */}
       <div className="col-6">
-        <label className="form-label">Taxa Corretagem</label>
+        <label className="form-label">Taxa de Corretagem</label>
         <div className="input-group">
           <span className="input-group-text">R$</span>
           <input

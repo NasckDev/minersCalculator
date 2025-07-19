@@ -144,3 +144,11 @@ tbody td{
 .btn-example{
   margin-top: 20px !important;
 }
+
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 50vh; /* ocupa metade da altura da tela */
+  min-height: 300px;
+}
+
