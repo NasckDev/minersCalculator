@@ -3,21 +3,25 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  BarController,
   BarElement,
+  LineController,
   PointElement,
   LineElement,
   Title,
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Chart } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { Chart } from 'react-chartjs-2';
 
-// Registro dos módulos do Chart.js
+// Registra todos os módulos necessários de uma única vez
 ChartJS.register(
   CategoryScale,
   LinearScale,
+  BarController,
   BarElement,
+  LineController,
   PointElement,
   LineElement,
   Title,
@@ -26,7 +30,7 @@ ChartJS.register(
   ChartDataLabels
 );
 
-// Formatação para moeda BRL
+// Função para formatar valores em Real (BRL)
 const formatarBRL = (valor: number) =>
   new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -39,7 +43,6 @@ interface Resultado {
   ir: number;
 }
 
-// Configurações padrão do gráfico
 const defaultOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -93,10 +96,8 @@ const defaultOptions = {
 };
 
 const IRCombinedChart: React.FC<{ resultados: Resultado[] }> = ({ resultados }) => {
-  // Filtra apenas operações de venda
   const vendas = resultados.filter(r => r.operacao.tipo === 'venda');
 
-  // Caso não haja vendas, exibe uma mensagem amigável
   if (vendas.length === 0) {
     return (
       <div
@@ -112,14 +113,13 @@ const IRCombinedChart: React.FC<{ resultados: Resultado[] }> = ({ resultados }) 
     const labels = vendas.map(v => v.operacao.data);
     const irValues = vendas.map(v => v.ir);
 
-    // Cálculo do IR acumulado
+    // Calcula IR acumulado
     const irAcumulado: number[] = [];
     irValues.reduce((acc, val, idx) => {
       irAcumulado[idx] = acc + val;
       return acc + val;
     }, 0);
 
-    // Dados do gráfico combinando barra (IR por venda) e linha (IR acumulado)
     const data = {
       labels,
       datasets: [
