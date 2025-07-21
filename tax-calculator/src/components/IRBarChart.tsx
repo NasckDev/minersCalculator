@@ -13,6 +13,7 @@ import {
 import { Chart } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
+// Registro dos módulos do Chart.js
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -25,6 +26,7 @@ ChartJS.register(
   ChartDataLabels
 );
 
+// Formatação para moeda BRL
 const formatarBRL = (valor: number) =>
   new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -37,7 +39,7 @@ interface Resultado {
   ir: number;
 }
 
-/** Opções padrão do gráfico para evitar recriação a cada render */
+// Configurações padrão do gráfico
 const defaultOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -51,9 +53,8 @@ const defaultOptions = {
     },
     tooltip: {
       callbacks: {
-        label: function (context: any) {
-          return `${context.dataset.label}: ${formatarBRL(context.parsed.y)}`;
-        },
+        label: (context: any) =>
+          `${context.dataset.label}: ${formatarBRL(context.parsed.y)}`,
       },
       backgroundColor: '#fff',
       titleColor: '#333',
@@ -67,10 +68,10 @@ const defaultOptions = {
     y: {
       beginAtZero: true,
       ticks: {
-        callback: function (tickValue: string | number) {
-          const valueNum =
+        callback: (tickValue: string | number) => {
+          const value =
             typeof tickValue === 'string' ? parseFloat(tickValue) : tickValue;
-          return formatarBRL(valueNum);
+          return formatarBRL(value);
         },
         color: '#555',
         font: { size: 12 },
@@ -92,58 +93,85 @@ const defaultOptions = {
 };
 
 const IRCombinedChart: React.FC<{ resultados: Resultado[] }> = ({ resultados }) => {
+  // Filtra apenas operações de venda
   const vendas = resultados.filter(r => r.operacao.tipo === 'venda');
-  const labels = vendas.map(v => v.operacao.data);
-  const irValues = vendas.map(v => v.ir);
 
-  // Cálculo de IR acumulado
-  const irAcumulado: number[] = [];
-  irValues.reduce((acc, val, idx) => {
-    irAcumulado[idx] = acc + val;
-    return acc + val;
-  }, 0);
+  // Caso não haja vendas, exibe uma mensagem amigável
+  if (vendas.length === 0) {
+    return (
+      <div
+        className="card p-3 shadow-sm chart-container"
+        style={{ backgroundColor: '#fff', minHeight: '350px' }}
+      >
+        <p className="text-center text-muted mt-5">Sem dados de vendas para exibir.</p>
+      </div>
+    );
+  }
 
-  const data = {
-    labels,
-    datasets: [
-      {
-        type: 'bar' as const,
-        label: 'IR por Venda',
-        data: irValues,
-        backgroundColor: 'rgba(77, 131, 240, 0.3)',
-        borderColor: '#4d83f0',
-        borderWidth: 2,
-        borderRadius: 6,
-        datalabels: {
-          anchor: 'end' as const,
-          align: 'end' as const,
-          color: '#4d83f0',
-          font: { size: 10, weight: 'bold' as const },
-          formatter: (value: number) => (value > 0 ? formatarBRL(value) : ''),
+  try {
+    const labels = vendas.map(v => v.operacao.data);
+    const irValues = vendas.map(v => v.ir);
+
+    // Cálculo do IR acumulado
+    const irAcumulado: number[] = [];
+    irValues.reduce((acc, val, idx) => {
+      irAcumulado[idx] = acc + val;
+      return acc + val;
+    }, 0);
+
+    // Dados do gráfico combinando barra (IR por venda) e linha (IR acumulado)
+    const data = {
+      labels,
+      datasets: [
+        {
+          type: 'bar' as const,
+          label: 'IR por Venda',
+          data: irValues,
+          backgroundColor: 'rgba(77, 131, 240, 0.3)',
+          borderColor: '#4d83f0',
+          borderWidth: 2,
+          borderRadius: 6,
+          datalabels: {
+            anchor: 'end' as const,
+            align: 'end' as const,
+            color: '#4d83f0',
+            font: { size: 10, weight: 'bold' as const },
+            formatter: (value: number) => (value > 0 ? formatarBRL(value) : ''),
+          },
         },
-      },
-      {
-        type: 'line' as const,
-        label: 'IR Acumulado',
-        data: irAcumulado,
-        borderColor: '#fa5378',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        fill: false,
-        tension: 0.3,
-        yAxisID: 'y',
-        datalabels: { display: false },
-      },
-    ],
-  };
+        {
+          type: 'line' as const,
+          label: 'IR Acumulado',
+          data: irAcumulado,
+          borderColor: '#fa5378',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          fill: false,
+          tension: 0.3,
+          yAxisID: 'y',
+          datalabels: { display: false },
+        },
+      ],
+    };
 
-  return (
-    <div
-      className="card p-3 shadow-sm chart-container"
-      style={{ backgroundColor: '#fff', minHeight: '350px' }}
-    >
-      <Chart type="bar" data={data} options={defaultOptions} />
-    </div>
-  );
+    return (
+      <div
+        className="card p-3 shadow-sm chart-container"
+        style={{ backgroundColor: '#fff', minHeight: '350px' }}
+      >
+        <Chart type="bar" data={data} options={defaultOptions} />
+      </div>
+    );
+  } catch (error) {
+    console.error('Erro ao renderizar gráfico:', error);
+    return (
+      <div
+        className="card p-3 shadow-sm chart-container"
+        style={{ backgroundColor: '#fff', minHeight: '350px' }}
+      >
+        <p className="text-center text-danger mt-5">Erro ao carregar gráfico.</p>
+      </div>
+    );
+  }
 };
 
 export default IRCombinedChart;
