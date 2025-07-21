@@ -1,148 +1,64 @@
-*{
+/* === Reset e ajustes globais === */
+* {
   box-sizing: border-box;
   outline: none;
 }
 
-input:focus, button:focus {
-  outline: none !important;
-  box-shadow: none !important; /* às vezes tem sombra azul também */
-}
-
-input[type="date"]:focus {
-  outline: 2px solid #f1f1f1;
-  box-shadow: 0 0 5px #f1f1f14f;
-}
-
-/* Remove setas no Chrome, Safari, Edge, Opera */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Remove setas no Firefox */
-input[type=number] {
-   appearance: textfield;
-  -moz-appearance: textfield;
-}
-
 body {
   margin: 0;
-  font-family: Public Sans,sans-serif;
+  font-family: 'Public Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.custom-card{
-  border-color: rgb(235, 235, 235)!important;
+/* === Foco e inputs === */
+input:focus,
+button:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+input[type='date']:focus {
+  outline: 2px solid #f1f1f1;
+  box-shadow: 0 0 5px #f1f1f14f;
+}
+
+/* Remove setas nos inputs number */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+/* === Cores e variáveis === */
+:root {
+  --primary-color: #7089e7;
+  --secondary-color: #4d83f0;
+  --text-color: #555555;
+  --border-color: rgb(235, 235, 235);
+}
+
+/* === Layout e containers === */
+.custom-card {
+  border-color: var(--border-color) !important;
   box-shadow: 0;
 }
 
-.content-header{
-  border-bottom:  1px solid rgb(221, 221, 221);
-  
- 
+.content-header {
+  border-bottom: 1px solid rgb(221, 221, 221);
 }
 
-.alert-card{
-margin-bottom: 30px !important;
-} 
-
-
-.title{
-  text-transform: uppercase;
-  font-weight: 800;
-  line-height: 1.4;
-  color: #4d83f0;
-  margin-top: 60px;
-}
-
-.sub-title{
-  font-weight: 600;
-  line-height: 1.4;
-  color: #555555;
-  margin-top: 60px;
-}
-label, .lbl{
-  margin-bottom: 5px;
-  color:#555555 !important;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-
-.btn-primary, .btn-outline-secondary{
-  background-color: #7089e7  !important;
-  border-color: #7089e7  !important;
-  color: white !important;
-
-}
-
-.input-group-text{
-  background-color: #7089e7  !important;
-  border-color: #7089e7  !important;
-  color: white !important;
-}
-
-.data{
-  color: #6985ea !important;
-  line-height: 20px !important;
-}
-
-.fs-5-5 {
-  font-size: 1.2rem; /* ajuste entre fs-5 (1.25rem) e fs-6 (1rem) */
-}
-
-
-.my-table {
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: 0.5rem; /* cantos semi arredondados */
-  overflow: hidden;
-  background-color: #fff; /* fundo branco */
-  border: solid 1px rgb(235, 235, 235)!important;
-  box-shadow: 0;
-}
-
-.table th {
-  margin-bottom: 5px;
-  color:#6985ea !important;
-  font-weight: 600;
-  text-transform: capitalize;
-  font-size: 1.1em !important;
-}
-tbody td{
-  color:#555555 !important;
-  white-space: nowrap !important; 
-  
-}
-
-
-
-.circle-date{
- background-color: #eee  !important;
- border-radius: 20px !important;
- padding: 8px !important;
- font-size: 0.8em !important;
- padding-left: 10px !important;
- padding-right: 10px !important;
- color: #333;
-}
-
-.bg-success, .bg-danger{
-  border-radius: 20px !important;
-  padding: 8px !important;
-   padding-left: 10px !important;
-  padding-right: 10px !important;
-}
-
-.btn-example{
-  margin-top: 20px !important;
+.alert-card {
+  margin-bottom: 30px !important;
 }
 
 .chart-container {
@@ -152,3 +68,93 @@ tbody td{
   min-height: 300px;
 }
 
+/* === Títulos e labels === */
+.title {
+  text-transform: uppercase;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--secondary-color);
+  margin-top: 60px;
+}
+
+.sub-title {
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-color);
+  margin-top: 60px;
+}
+
+label,
+.lbl {
+  margin-bottom: 5px;
+  color: var(--text-color) !important;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* === Botões e inputs === */
+.btn-primary,
+.btn-outline-secondary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: white !important;
+}
+
+.input-group-text {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: white !important;
+}
+
+.btn-example {
+  margin-top: 20px !important;
+}
+
+/* === Tabelas === */
+.my-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #fff;
+  border: solid 1px var(--border-color) !important;
+  box-shadow: 0;
+}
+
+.table th {
+  margin-bottom: 5px;
+  color: var(--secondary-color) !important;
+  font-weight: 600;
+  text-transform: capitalize;
+  font-size: 1.1em !important;
+}
+
+tbody td {
+  color: var(--text-color) !important;
+  white-space: nowrap !important;
+}
+
+/* Datas e badges */
+.circle-date {
+  background-color: #eee !important;
+  border-radius: 20px !important;
+  padding: 8px 10px !important;
+  font-size: 0.8em !important;
+  color: #333;
+}
+
+.bg-success,
+.bg-danger {
+  border-radius: 20px !important;
+  padding: 8px 10px !important;
+}
+
+/* === Utilitários === */
+.data {
+  color: var(--primary-color) !important;
+  line-height: 20px !important;
+}
+
+.fs-5-5 {
+  font-size: 1.2rem;
+}
