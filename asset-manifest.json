@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/minersCalculator/static/css/main.dde8578f.css",
+    "main.js": "/minersCalculator/static/js/main.f7c9a94a.js",
+    "index.html": "/minersCalculator/index.html",
+    "main.dde8578f.css.map": "/minersCalculator/static/css/main.dde8578f.css.map",
+    "main.f7c9a94a.js.map": "/minersCalculator/static/js/main.f7c9a94a.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dde8578f.css",
+    "static/js/main.f7c9a94a.js"
+  ]
+}
