@@ -28,3 +28,9 @@ Execute o servidor de desenvolvimento:
 npm run dev
 ```
 Abra no navegador: http://localhost:300 (ou porta apontada no console)
+
+## 🚀 Demo
+
+Confira a aplicação online aqui:  
+
+[![View Demo](https://img.shields.io/badge/View-Demo-brightgreen?style=for-the-badge&logo=github)](https://nasckdev.github.io/minersCalculator/)
