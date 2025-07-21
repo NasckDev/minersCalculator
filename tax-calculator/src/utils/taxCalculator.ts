@@ -3,6 +3,7 @@ import { Operacao } from '../types';
 export interface Resultado {
   operacao: Operacao;
   ir: number;  // imposto devido
+  ra: number;  // resultado auferido da operação (lucro ou prejuízo)
   pm: number;  // preço médio atualizado
   qm: number;  // quantidade média atual
   pa: number;  // prejuízo acumulado
@@ -10,7 +11,8 @@ export interface Resultado {
 
 /**
  * Calcula o IR por operação, atualizando preço médio (PM),
- * quantidade média (QM) e prejuízo acumulado (PA) para cada ativo.
+ * quantidade média (QM), resultado auferido (RA)
+ * e prejuízo acumulado (PA) para cada ativo.
  */
 export function calcularIRPorOperacao(operacoes: Operacao[]): Resultado[] {
   const posicoes: Record<string, { pm: number; qm: number; pa: number }> = {};
@@ -28,20 +30,18 @@ export function calcularIRPorOperacao(operacoes: Operacao[]): Resultado[] {
     }
 
     const pos = posicoes[ticker];
+    let ra = 0;
+    let ir = 0;
 
     if (op.tipo === 'compra') {
       // Compra: recalcula preço médio ponderado
       const totalCompra = pos.pm * pos.qm + op.preco * op.quantidade + op.taxaCorretagem;
       pos.qm += op.quantidade;
       pos.pm = totalCompra / pos.qm;
-
-      resultados.push({ operacao: op, ir: 0, pm: pos.pm, qm: pos.qm, pa: pos.pa });
     } else {
       // Venda: calcula resultado da operação (RA)
-      const ra = (op.preco - pos.pm) * op.quantidade - op.taxaCorretagem;
+      ra = (op.preco - pos.pm) * op.quantidade - op.taxaCorretagem;
       pos.qm -= op.quantidade;
-
-      let ir = 0;
 
       if (ra < 0) {
         // Prejuízo: acumula no PA (valor negativo)
@@ -53,9 +53,9 @@ export function calcularIRPorOperacao(operacoes: Operacao[]): Resultado[] {
         pos.pa += abatimento; // reduz prejuízo acumulado (PA sobe, mas deve permanecer ≤ 0)
         if (pos.pa > 0) pos.pa = 0;
       }
-
-      resultados.push({ operacao: op, ir, pm: pos.pm, qm: pos.qm, pa: pos.pa });
     }
+
+    resultados.push({ operacao: op, ir, ra, pm: pos.pm, qm: pos.qm, pa: pos.pa });
   }
 
   return resultados;

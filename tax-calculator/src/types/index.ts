@@ -16,4 +16,5 @@ export interface Posicao {
   pm: number;  // preço médio
   qm: number;  // quantidade média
   pa: number;  // prejuízo acumulado
+  ra: number; // resultado auferido
 }

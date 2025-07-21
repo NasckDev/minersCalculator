@@ -144,7 +144,8 @@ tbody td {
 }
 
 .bg-success,
-.bg-danger {
+.bg-danger,
+.bg-secondary {
   border-radius: 20px !important;
   padding: 8px 10px !important;
 }

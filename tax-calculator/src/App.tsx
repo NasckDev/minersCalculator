@@ -26,7 +26,7 @@ const App: React.FC = () => {
     <>
       <Header />
       <div className="container mt-4">
-        <h1 className="mb-1 fs-2 fw-bold title">Calculadora IR Bolsa</h1>
+        <h1 className="mb-1 fs-2 fw-bold title">Calculadora de IR para Ações</h1>
         <p className="mb-4 fs-6 fw-normal text-secondary">
           Calculadora Simplificada de Imposto de Renda para operações na Bolsa.
         </p>
@@ -42,24 +42,10 @@ const App: React.FC = () => {
             <h6 className="mb-3 lbl ps-4 mb-5">Dados da última operação</h6>
             <div className="row text-center">
               {[
-                {
-                  label: 'Preço Médio',
-                  value:
-                    ultimoResultado.pm !== undefined
-                      ? formatarBRL(ultimoResultado.pm)
-                      : 'N/A',
-                },
-                {
-                  label: 'Quantidade média',
-                  value: ultimoResultado.qm ?? 'N/A',
-                },
-                {
-                  label: 'Prejuízo acumulado',
-                  value:
-                    ultimoResultado.pa !== undefined
-                      ? formatarBRL(ultimoResultado.pa)
-                      : 'N/A',
-                },
+                { label: 'Preço Médio', value: formatarBRL(ultimoResultado.pm) },
+                { label: 'Quantidade Média', value: ultimoResultado.qm },
+                { label: 'Prejuízo Acumulado', value: formatarBRL(ultimoResultado.pa) },
+                { label: 'Resultado da Venda', value: formatarBRL(ultimoResultado.ra) },
               ].map(({ label, value }) => (
                 <div className="col" key={label}>
                   <p className="mb-1 fs-5 fw-bold data">{label}</p>
@@ -92,6 +78,7 @@ const App: React.FC = () => {
                       'Preço',
                       'Quantidade',
                       'Corretagem',
+                      'Resultados',
                       'IR',
                     ].map(header => (
                       <th key={header}>{header}</th>
@@ -99,18 +86,12 @@ const App: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {resultados.map(({ operacao, ir }) => (
+                  {resultados.map(({ operacao, ra, ir }) => (
                     <tr key={operacao.id}>
                       <td className="date">
                         <span className="circle-date">{operacao.data}</span>
                       </td>
-                      <td
-                        className={
-                          operacao.tipo === 'compra'
-                            ? 'text-success'
-                            : 'text-danger'
-                        }
-                      >
+                      <td className={operacao.tipo === 'compra' ? 'text-success' : 'text-danger'}>
                         {operacao.tipo.toUpperCase()}
                       </td>
                       <td>{operacao.ticker}</td>
@@ -120,7 +101,18 @@ const App: React.FC = () => {
                       <td>
                         {operacao.tipo === 'venda' ? (
                           <span
-                            className={`badge ${ir > 0 ? 'bg-danger' : 'bg-success'}`}
+                            className={`badge ${ra >= 0 ? 'bg-success' : 'bg-danger'}`}
+                          >
+                            {formatarBRL(ra)}
+                          </span>
+                        ) : (
+                          '-'
+                        )}
+                      </td>
+                      <td>
+                        {operacao.tipo === 'venda' ? (
+                          <span
+                            className={`badge ${ir > 0 ? 'bg-danger' : 'bg-secondary'}`}
                           >
                             {formatarBRL(ir)}
                           </span>
