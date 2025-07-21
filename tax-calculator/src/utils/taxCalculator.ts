@@ -34,23 +34,26 @@ export function calcularIRPorOperacao(operacoes: Operacao[]): Resultado[] {
     let ir = 0;
 
     if (op.tipo === 'compra') {
-      // Compra: recalcula preço médio ponderado
       const totalCompra = pos.pm * pos.qm + op.preco * op.quantidade + op.taxaCorretagem;
       pos.qm += op.quantidade;
       pos.pm = totalCompra / pos.qm;
     } else {
-      // Venda: calcula resultado da operação (RA)
+      // Validação: não pode vender mais do que tem
+      if (op.quantidade > pos.qm) {
+        throw new Error(
+          `Venda inválida: tentando vender ${op.quantidade} ações de ${ticker}, mas possui apenas ${pos.qm}.`
+        );
+      }
+
       ra = (op.preco - pos.pm) * op.quantidade - op.taxaCorretagem;
       pos.qm -= op.quantidade;
 
       if (ra < 0) {
-        // Prejuízo: acumula no PA (valor negativo)
         pos.pa += ra;
       } else if (ra > 0) {
-        // Lucro: compensa com prejuízo acumulado (se houver) antes de calcular IR
         const abatimento = Math.min(ra, Math.abs(pos.pa));
-        ir = (ra - abatimento) * 0.15; // alíquota fixa 15%
-        pos.pa += abatimento; // reduz prejuízo acumulado (PA sobe, mas deve permanecer ≤ 0)
+        ir = (ra - abatimento) * 0.15;
+        pos.pa += abatimento;
         if (pos.pa > 0) pos.pa = 0;
       }
     }

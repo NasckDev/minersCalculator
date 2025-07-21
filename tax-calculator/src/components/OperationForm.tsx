@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import CreatableSelect from 'react-select/creatable';
 import { Operacao } from '../types';
 
 interface Props {
   onAdd: (op: Omit<Operacao, 'id'>) => void;
+  tickersSugeridos: string[];
 }
 
-/** Formulário para adicionar operações de compra ou venda */
-const FormOperacao: React.FC<Props> = ({ onAdd }) => {
+const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
   const [data, setData] = useState('');
   const [tipo, setTipo] = useState<'compra' | 'venda'>('compra');
   const [ticker, setTicker] = useState('');
@@ -31,7 +32,7 @@ const FormOperacao: React.FC<Props> = ({ onAdd }) => {
       taxaCorretagem: Number(taxaCorretagem),
     });
 
-    // Reseta formulário
+    // reset form
     setData('');
     setTicker('');
     setPreco('');
@@ -39,31 +40,34 @@ const FormOperacao: React.FC<Props> = ({ onAdd }) => {
     setTaxaCorretagem('');
   };
 
-  const incrementarQuantidade = () =>
-    setQuantidade(prev => String(Number(prev || '0') + 1));
+  const options = tickersSugeridos.map((t) => ({ value: t, label: t }));
 
-  const decrementarQuantidade = () =>
-    setQuantidade(prev => (Number(prev) > 0 ? String(Number(prev) - 1) : '0'));
+  const alterarQuantidade = (delta: number) => {
+    setQuantidade((prev) => {
+      const atual = Number(prev || '0');
+      return String(Math.max(atual + delta, 0));
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit} className="row g-4">
-      {/* Data da operação */}
+      {/* Data */}
       <div className="col-6">
         <label className="form-label">Data</label>
         <input
           type="date"
           className="form-control"
           value={data}
-          onChange={e => setData(e.target.value)}
+          onChange={(e) => setData(e.target.value)}
           required
         />
       </div>
 
-      {/* Tipo da operação */}
+      {/* Tipo */}
       <div className="col-6">
         <label className="form-label">Tipo</label>
         <div className="btn-group w-100">
-          {(['compra', 'venda'] as const).map(op => (
+          {(['compra', 'venda'] as const).map((op) => (
             <React.Fragment key={op}>
               <input
                 type="radio"
@@ -86,17 +90,34 @@ const FormOperacao: React.FC<Props> = ({ onAdd }) => {
       {/* Ticker */}
       <div className="col-6">
         <label className="form-label">Nome da Ação</label>
-        <input
-          type="text"
-          className="form-control"
+        <CreatableSelect
+          options={options}
+          value={ticker ? { value: ticker, label: ticker } : null}
+          onChange={(newValue) => {
+            if (newValue) setTicker(newValue.value.toUpperCase());
+          }}
+          onInputChange={(input, actionMeta) => {
+            if (actionMeta.action === 'input-change') {
+              setTicker(input.toUpperCase());
+            }
+          }}
           placeholder="Ex.: PETR4"
-          value={ticker}
-          onChange={e => setTicker(e.target.value)}
-          required
+          isClearable
+          formatCreateLabel={(inputValue) => `Adicionar "${inputValue.toUpperCase()}"`}
+          noOptionsMessage={() => 'Nenhum resultado'}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && ticker.trim() !== '') {
+              e.preventDefault();
+            }
+          }}
+          menuPortalTarget={document.body}
+          styles={{
+            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+          }}
         />
       </div>
 
-      {/* Preço da ação */}
+      {/* Preço */}
       <div className="col-6">
         <label className="form-label">Preço</label>
         <div className="input-group">
@@ -108,7 +129,7 @@ const FormOperacao: React.FC<Props> = ({ onAdd }) => {
             min="0"
             placeholder="0,00"
             value={preco}
-            onChange={e => setPreco(e.target.value)}
+            onChange={(e) => setPreco(e.target.value)}
             required
           />
         </div>
@@ -121,7 +142,7 @@ const FormOperacao: React.FC<Props> = ({ onAdd }) => {
           <button
             type="button"
             className="btn btn-outline-secondary"
-            onClick={decrementarQuantidade}
+            onClick={() => alterarQuantidade(-1)}
           >
             –
           </button>
@@ -129,14 +150,14 @@ const FormOperacao: React.FC<Props> = ({ onAdd }) => {
             type="number"
             className="form-control text-center"
             value={quantidade}
-            onChange={e => setQuantidade(e.target.value)}
+            onChange={(e) => setQuantidade(e.target.value)}
             min="0"
             required
           />
           <button
             type="button"
             className="btn btn-outline-secondary"
-            onClick={incrementarQuantidade}
+            onClick={() => alterarQuantidade(1)}
           >
             +
           </button>
@@ -154,13 +175,13 @@ const FormOperacao: React.FC<Props> = ({ onAdd }) => {
             className="form-control"
             placeholder="0,00"
             value={taxaCorretagem}
-            onChange={e => setTaxaCorretagem(e.target.value)}
+            onChange={(e) => setTaxaCorretagem(e.target.value)}
             required
           />
         </div>
       </div>
 
-      {/* Botão de envio */}
+      {/* Botão */}
       <div className="col-12 text-end">
         <button type="submit" className="btn btn-primary">
           Adicionar

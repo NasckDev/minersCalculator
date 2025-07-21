@@ -7,20 +7,59 @@ import IRCombinedChart from './components/IRBarChart';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
-const formatarBRL = (valor: number) =>
-  new Intl.NumberFormat('pt-BR', {
+const formatarBRL = (valor: number | undefined | null) => {
+  if (valor === undefined || valor === null || isNaN(valor)) return '—';
+  return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
   }).format(valor);
+};
 
 const App: React.FC = () => {
   const [operacoes, setOperacoes] = useState<Operacao[]>([]);
+  const [erro, setErro] = useState<string | null>(null);
 
-  const adicionarOperacao = (op: Omit<Operacao, 'id'>) =>
+  // Calcula quantidade média atual para um ticker
+  const calcularQuantidadeMediaAtual = (ticker: string): number => {
+    let qm = 0;
+    for (const op of operacoes) {
+      if (op.ticker === ticker) {
+        if (op.tipo === 'compra') {
+          qm += op.quantidade;
+        } else if (op.tipo === 'venda') {
+          qm -= op.quantidade;
+        }
+      }
+    }
+    return qm;
+  };
+
+  // Função para adicionar operação com validação
+  const adicionarOperacao = (op: Omit<Operacao, 'id'>) => {
+    setErro(null); // limpa erro anterior
+
+    if (op.tipo === 'venda') {
+      const qmAtual = calcularQuantidadeMediaAtual(op.ticker);
+      if (op.quantidade > qmAtual) {
+        setErro(`Não é possível vender ${op.quantidade} ações de ${op.ticker}, pois você possui apenas ${qmAtual}.`);
+        return;
+      }
+    }
+
     setOperacoes(prev => [...prev, { ...op, id: uuidv4() }]);
+  };
 
-  const resultados: Resultado[] = calcularIRPorOperacao(operacoes);
+  // Chamada segura do cálculo de IR com tratamento de erro
+  let resultados: Resultado[] = [];
+  try {
+    resultados = calcularIRPorOperacao(operacoes);
+  } catch (e: any) {
+    setErro(e.message || 'Erro no cálculo');
+  }
+
   const ultimoResultado: Resultado | undefined = resultados.at(-1);
+
+  const tickersSugeridos = Array.from(new Set(operacoes.map(op => op.ticker)));
 
   return (
     <>
@@ -31,9 +70,16 @@ const App: React.FC = () => {
           Calculadora Simplificada de Imposto de Renda para operações na Bolsa.
         </p>
 
+        {/* Mostra erro se existir */}
+        {erro && (
+          <div className="alert alert-danger" role="alert">
+            {erro}
+          </div>
+        )}
+
         {/* Formulário de cadastro da operação */}
         <div className="card custom-card p-5 mb-4 shadow-sm">
-          <FormOperacao onAdd={adicionarOperacao} />
+          <FormOperacao onAdd={adicionarOperacao} tickersSugeridos={tickersSugeridos} />
         </div>
 
         {/* Última operação */}
@@ -64,23 +110,11 @@ const App: React.FC = () => {
               Registro de operações de compras e vendas realizadas na Bolsa.
             </p>
 
-            <div
-              className="table-responsive"
-              style={{ maxHeight: '500px', overflowY: 'auto' }}
-            >
+            <div className="table-responsive" style={{ maxHeight: '500px', overflowY: 'auto' }}>
               <table className="table text-center my-table p-5 mb-4 mt-2 shadow-sm">
                 <thead>
                   <tr>
-                    {[
-                      'Data',
-                      'Tipo',
-                      'Ação',
-                      'Preço',
-                      'Quantidade',
-                      'Corretagem',
-                      'Resultados',
-                      'IR',
-                    ].map(header => (
+                    {['Data', 'Tipo', 'Ação', 'Preço', 'Quantidade', 'Corretagem', 'Resultado', 'IR'].map(header => (
                       <th key={header}>{header}</th>
                     ))}
                   </tr>
@@ -100,9 +134,7 @@ const App: React.FC = () => {
                       <td>{formatarBRL(operacao.taxaCorretagem)}</td>
                       <td>
                         {operacao.tipo === 'venda' ? (
-                          <span
-                            className={`badge ${ra >= 0 ? 'bg-success' : 'bg-danger'}`}
-                          >
+                          <span className={`badge ${ra! >= 0 ? 'bg-success' : 'bg-danger'}`}>
                             {formatarBRL(ra)}
                           </span>
                         ) : (
@@ -111,9 +143,7 @@ const App: React.FC = () => {
                       </td>
                       <td>
                         {operacao.tipo === 'venda' ? (
-                          <span
-                            className={`badge ${ir > 0 ? 'bg-danger' : 'bg-secondary'}`}
-                          >
+                          <span className={`badge ${ir > 0 ? 'bg-danger' : 'bg-secondary'}`}>
                             {formatarBRL(ir)}
                           </span>
                         ) : (
