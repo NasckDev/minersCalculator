@@ -73,17 +73,6 @@ const App: React.FC = () => {
     setOperacoes(prev => [...prev, { ...op, id: uuidv4() }]);
   };
 
-  // Função para inserir operações de exemplo
-  const adicionarOperacoesExemplo = () => {
-    const exemplo: Omit<Operacao, 'id'>[] = [
-      { data: '2025-07-21', tipo: 'compra', ticker: 'PETR4', preco: 25.9, quantidade: 100, taxaCorretagem: 8.5 },
-      { data: '2025-07-22', tipo: 'compra', ticker: 'PETR4', preco: 26.4, quantidade: 200, taxaCorretagem: 8.5 },
-      { data: '2025-07-23', tipo: 'compra', ticker: 'PETR4', preco: 27.87, quantidade: 100, taxaCorretagem: 8.5 },
-      { data: '2025-07-24', tipo: 'venda', ticker: 'PETR4', preco: 26.53, quantidade: 100, taxaCorretagem: 8.5 },
-      { data: '2025-07-25', tipo: 'venda', ticker: 'PETR4', preco: 27.39, quantidade: 100, taxaCorretagem: 8.5 },
-    ];
-    setOperacoes(exemplo.map(op => ({ ...op, id: uuidv4() })));
-  };
 
   // Atualiza os resultados e erros quando 'operacoes' mudam
   useEffect(() => {
