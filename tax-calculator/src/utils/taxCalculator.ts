@@ -3,16 +3,15 @@ import { Operacao } from '../types';
 export interface Resultado {
   operacao: Operacao;
   ir: number;  // imposto devido
-  ra: number;  // resultado auferido da operação (lucro ou prejuízo)
+  ra: number;  // resultado auferido (lucro ou prejuízo)
   pm: number;  // preço médio atualizado
   qm: number;  // quantidade média atual
   pa: number;  // prejuízo acumulado
 }
 
 /**
- * Calcula o IR por operação, atualizando preço médio (PM),
- * quantidade média (QM), resultado auferido (RA)
- * e prejuízo acumulado (PA) para cada ativo.
+ * Calcula IR, preço médio, quantidade média e prejuízo acumulado
+ * para cada operação, por ticker, seguindo as regras da Receita.
  */
 export function calcularIRPorOperacao(operacoes: Operacao[]): Resultado[] {
   const posicoes: Record<string, { pm: number; qm: number; pa: number }> = {};
@@ -24,7 +23,7 @@ export function calcularIRPorOperacao(operacoes: Operacao[]): Resultado[] {
   );
 
   for (const op of opsOrdenadas) {
-    const ticker = op.ticker;
+    const ticker = op.ticker.toUpperCase();
     if (!posicoes[ticker]) {
       posicoes[ticker] = { pm: 0, qm: 0, pa: 0 };
     }
@@ -34,31 +33,47 @@ export function calcularIRPorOperacao(operacoes: Operacao[]): Resultado[] {
     let ir = 0;
 
     if (op.tipo === 'compra') {
+      // Atualiza PM e QM na compra
       const totalCompra = pos.pm * pos.qm + op.preco * op.quantidade + op.taxaCorretagem;
       pos.qm += op.quantidade;
-      pos.pm = totalCompra / pos.qm;
-    } else {
-      // Validação: não pode vender mais do que tem
+      pos.pm = pos.qm > 0 ? totalCompra / pos.qm : 0;
+
+    } else if (op.tipo === 'venda') {
+      // Valida se existe quantidade suficiente
       if (op.quantidade > pos.qm) {
         throw new Error(
           `Venda inválida: tentando vender ${op.quantidade} ações de ${ticker}, mas possui apenas ${pos.qm}.`
         );
       }
 
+      // Calcula resultado da venda
       ra = (op.preco - pos.pm) * op.quantidade - op.taxaCorretagem;
       pos.qm -= op.quantidade;
 
       if (ra < 0) {
+        // Prejuízo aumenta o prejuízo acumulado
         pos.pa += ra;
       } else if (ra > 0) {
-        const abatimento = Math.min(ra, Math.abs(pos.pa));
-        ir = (ra - abatimento) * 0.15;
-        pos.pa += abatimento;
+        // Lucro: compensa prejuízo acumulado antes de calcular IR
+        const compensacao = Math.min(ra, Math.abs(pos.pa));
+        const lucroTributavel = ra - compensacao;
+
+        ir = lucroTributavel * 0.15; // 15% sobre lucro após compensação
+        pos.pa += compensacao; // PA é negativo, aumenta (vai para 0)
+
+        // Se PA ficar positivo (não pode), zera
         if (pos.pa > 0) pos.pa = 0;
       }
     }
 
-    resultados.push({ operacao: op, ir, ra, pm: pos.pm, qm: pos.qm, pa: pos.pa });
+    resultados.push({
+      operacao: op,
+      ir,
+      ra,
+      pm: pos.pm,
+      qm: pos.qm,
+      pa: pos.pa
+    });
   }
 
   return resultados;

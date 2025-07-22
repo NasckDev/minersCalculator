@@ -7,6 +7,33 @@ interface Props {
   tickersSugeridos: string[];
 }
 
+// Função para formatar valor em moeda BRL enquanto digita
+const formatarMoedaBRL = (valor: string): string => {
+  // Remove tudo que não é número
+  const numeros = valor.replace(/\D/g, '');
+
+  // Pega os últimos 2 dígitos como centavos
+  const centavos = numeros.slice(-2);
+  const inteiros = numeros.slice(0, -2);
+
+  // Formata os inteiros com separador de milhar
+  const inteirosFormatados = inteiros
+    ? parseInt(inteiros, 10).toLocaleString('pt-BR')
+    : '0';
+
+  return `R$ ${inteirosFormatados},${centavos.padStart(2, '0')}`;
+};
+
+// Função para converter string formatada para número float
+const moedaParaNumero = (valor: string): number => {
+  if (!valor) return 0;
+  // Remove tudo que não seja número ou vírgula
+  const somenteNumeros = valor.replace(/[^0-9,]/g, '');
+  // Troca vírgula por ponto para parseFloat
+  const valorPonto = somenteNumeros.replace(',', '.');
+  return parseFloat(valorPonto) || 0;
+};
+
 const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
   const [data, setData] = useState('');
   const [tipo, setTipo] = useState<'compra' | 'venda'>('compra');
@@ -27,9 +54,9 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
       data,
       tipo,
       ticker: ticker.toUpperCase(),
-      preco: Number(preco),
+      preco: moedaParaNumero(preco),
       quantidade: Number(quantidade),
-      taxaCorretagem: Number(taxaCorretagem),
+      taxaCorretagem: moedaParaNumero(taxaCorretagem),
     });
 
     // reset form
@@ -47,6 +74,18 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
       const atual = Number(prev || '0');
       return String(Math.max(atual + delta, 0));
     });
+  };
+
+  // Função para controlar input de preço e taxa com máscara
+  const handleChangeMoeda = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setFunc: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const valor = e.target.value;
+    // Remove "R$ " e formata
+    const valorSemPrefixo = valor.replace(/^R\$\s?/, '');
+    const valorFormatado = formatarMoedaBRL(valorSemPrefixo);
+    setFunc(valorFormatado);
   };
 
   return (
@@ -95,6 +134,7 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
           value={ticker ? { value: ticker, label: ticker } : null}
           onChange={(newValue) => {
             if (newValue) setTicker(newValue.value.toUpperCase());
+            else setTicker('');
           }}
           onInputChange={(input, actionMeta) => {
             if (actionMeta.action === 'input-change') {
@@ -120,19 +160,14 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
       {/* Preço */}
       <div className="col-6">
         <label className="form-label">Preço</label>
-        <div className="input-group">
-          <span className="input-group-text">R$</span>
-          <input
-            type="number"
-            className="form-control"
-            step="0.01"
-            min="0"
-            placeholder="0,00"
-            value={preco}
-            onChange={(e) => setPreco(e.target.value)}
-            required
-          />
-        </div>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="R$ 0,00"
+          value={preco}
+          onChange={(e) => handleChangeMoeda(e, setPreco)}
+          required
+        />
       </div>
 
       {/* Quantidade */}
@@ -167,18 +202,14 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
       {/* Taxa de corretagem */}
       <div className="col-6">
         <label className="form-label">Taxa de Corretagem</label>
-        <div className="input-group">
-          <span className="input-group-text">R$</span>
-          <input
-            type="number"
-            step="0.01"
-            className="form-control"
-            placeholder="0,00"
-            value={taxaCorretagem}
-            onChange={(e) => setTaxaCorretagem(e.target.value)}
-            required
-          />
-        </div>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="R$ 0,00"
+          value={taxaCorretagem}
+          onChange={(e) => handleChangeMoeda(e, setTaxaCorretagem)}
+          required
+        />
       </div>
 
       {/* Botão */}

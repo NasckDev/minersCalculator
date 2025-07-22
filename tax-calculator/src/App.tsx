@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Operacao } from './types';
 import { calcularIRPorOperacao, Resultado } from './utils/taxCalculator';
@@ -18,6 +18,7 @@ const formatarBRL = (valor: number | undefined | null) => {
 const App: React.FC = () => {
   const [operacoes, setOperacoes] = useState<Operacao[]>([]);
   const [erro, setErro] = useState<string | null>(null);
+  const [resultados, setResultados] = useState<Resultado[]>([]);
 
   // Calcula quantidade média atual para um ticker
   const calcularQuantidadeMediaAtual = (ticker: string): number => {
@@ -34,6 +35,17 @@ const App: React.FC = () => {
     return qm;
   };
 
+  // Função para obter a data da compra mais antiga para um ticker
+  const dataCompraMaisAntiga = (ticker: string): Date | null => {
+    const datasCompra = operacoes
+      .filter(op => op.ticker === ticker && op.tipo === 'compra')
+      .map(op => new Date(op.data));
+
+    if (datasCompra.length === 0) return null;
+
+    return new Date(Math.min(...datasCompra.map(d => d.getTime())));
+  };
+
   // Função para adicionar operação com validação
   const adicionarOperacao = (op: Omit<Operacao, 'id'>) => {
     setErro(null); // limpa erro anterior
@@ -41,7 +53,19 @@ const App: React.FC = () => {
     if (op.tipo === 'venda') {
       const qmAtual = calcularQuantidadeMediaAtual(op.ticker);
       if (op.quantidade > qmAtual) {
-        setErro(`Não é possível vender ${op.quantidade} ações de ${op.ticker}, pois você possui apenas ${qmAtual}.`);
+        setErro(
+          `Não é possível vender ${op.quantidade} ações de ${op.ticker}, pois você possui apenas ${qmAtual}.`
+        );
+        return;
+      }
+
+      const dataVenda = new Date(op.data);
+      const dataCompra = dataCompraMaisAntiga(op.ticker);
+
+      if (dataCompra && dataVenda < dataCompra) {
+        setErro(
+          `Não é possível registrar uma venda em ${op.data} antes da primeira compra da ação ${op.ticker} em ${dataCompra.toLocaleDateString()}.`
+        );
         return;
       }
     }
@@ -49,13 +73,29 @@ const App: React.FC = () => {
     setOperacoes(prev => [...prev, { ...op, id: uuidv4() }]);
   };
 
-  // Chamada segura do cálculo de IR com tratamento de erro
-  let resultados: Resultado[] = [];
-  try {
-    resultados = calcularIRPorOperacao(operacoes);
-  } catch (e: any) {
-    setErro(e.message || 'Erro no cálculo');
-  }
+  // Função para inserir operações de exemplo
+  const adicionarOperacoesExemplo = () => {
+    const exemplo: Omit<Operacao, 'id'>[] = [
+      { data: '2025-07-21', tipo: 'compra', ticker: 'PETR4', preco: 25.9, quantidade: 100, taxaCorretagem: 8.5 },
+      { data: '2025-07-22', tipo: 'compra', ticker: 'PETR4', preco: 26.4, quantidade: 200, taxaCorretagem: 8.5 },
+      { data: '2025-07-23', tipo: 'compra', ticker: 'PETR4', preco: 27.87, quantidade: 100, taxaCorretagem: 8.5 },
+      { data: '2025-07-24', tipo: 'venda', ticker: 'PETR4', preco: 26.53, quantidade: 100, taxaCorretagem: 8.5 },
+      { data: '2025-07-25', tipo: 'venda', ticker: 'PETR4', preco: 27.39, quantidade: 100, taxaCorretagem: 8.5 },
+    ];
+    setOperacoes(exemplo.map(op => ({ ...op, id: uuidv4() })));
+  };
+
+  // Atualiza os resultados e erros quando 'operacoes' mudam
+  useEffect(() => {
+    setErro(null);
+    try {
+      const res = calcularIRPorOperacao(operacoes);
+      setResultados(res);
+    } catch (e: any) {
+      setErro(e.message || 'Erro no cálculo');
+      setResultados([]);
+    }
+  }, [operacoes]);
 
   const ultimoResultado: Resultado | undefined = resultados.at(-1);
 
@@ -69,6 +109,13 @@ const App: React.FC = () => {
         <p className="mb-4 fs-6 fw-normal text-secondary">
           Calculadora Simplificada de Imposto de Renda para operações na Bolsa.
         </p>
+
+        {/* Botão provisório para adicionar operações de exemplo */}
+        <div className="mb-3">
+          <button onClick={adicionarOperacoesExemplo} className="btn btn-warning">
+            Inserir Operações de Exemplo (PETR4)
+          </button>
+        </div>
 
         {/* Mostra erro se existir */}
         {erro && (
@@ -114,9 +161,11 @@ const App: React.FC = () => {
               <table className="table text-center my-table p-5 mb-4 mt-2 shadow-sm">
                 <thead>
                   <tr>
-                    {['Data', 'Tipo', 'Ação', 'Preço', 'Quantidade', 'Corretagem', 'Resultado', 'IR'].map(header => (
-                      <th key={header}>{header}</th>
-                    ))}
+                    {['Data', 'Tipo', 'Ação', 'Preço', 'Quantidade', 'Corretagem', 'Resultado', 'IR'].map(
+                      header => (
+                        <th key={header}>{header}</th>
+                      )
+                    )}
                   </tr>
                 </thead>
                 <tbody>
