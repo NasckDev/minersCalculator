@@ -110,13 +110,6 @@ const App: React.FC = () => {
           Calculadora Simplificada de Imposto de Renda para operações na Bolsa.
         </p>
 
-        {/* Botão provisório para adicionar operações de exemplo */}
-        <div className="mb-3">
-          <button onClick={adicionarOperacoesExemplo} className="btn btn-warning">
-            Inserir Operações de Exemplo (PETR4)
-          </button>
-        </div>
-
         {/* Mostra erro se existir */}
         {erro && (
           <div className="alert alert-danger" role="alert">
