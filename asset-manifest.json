@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/minersCalculator/static/css/main.ba94c22e.css",
-    "main.js": "/minersCalculator/static/js/main.05598e7f.js",
+    "main.css": "/minersCalculator/static/css/main.d9fe6e75.css",
+    "main.js": "/minersCalculator/static/js/main.0b976c8f.js",
     "index.html": "/minersCalculator/index.html",
-    "main.ba94c22e.css.map": "/minersCalculator/static/css/main.ba94c22e.css.map",
-    "main.05598e7f.js.map": "/minersCalculator/static/js/main.05598e7f.js.map"
+    "main.d9fe6e75.css.map": "/minersCalculator/static/css/main.d9fe6e75.css.map",
+    "main.0b976c8f.js.map": "/minersCalculator/static/js/main.0b976c8f.js.map"
   },
   "entrypoints": [
-    "static/css/main.ba94c22e.css",
-    "static/js/main.05598e7f.js"
+    "static/css/main.d9fe6e75.css",
+    "static/js/main.0b976c8f.js"
   ]
 }
