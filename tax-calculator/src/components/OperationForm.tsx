@@ -9,27 +9,19 @@ interface Props {
 
 // Função para formatar valor em moeda BRL enquanto digita
 const formatarMoedaBRL = (valor: string): string => {
-  // Remove tudo que não é número
   const numeros = valor.replace(/\D/g, '');
-
-  // Pega os últimos 2 dígitos como centavos
   const centavos = numeros.slice(-2);
   const inteiros = numeros.slice(0, -2);
-
-  // Formata os inteiros com separador de milhar
   const inteirosFormatados = inteiros
     ? parseInt(inteiros, 10).toLocaleString('pt-BR')
     : '0';
-
   return `R$ ${inteirosFormatados},${centavos.padStart(2, '0')}`;
 };
 
-// Função para converter string formatada para número float
+// Converte string formatada para número float
 const moedaParaNumero = (valor: string): number => {
   if (!valor) return 0;
-  // Remove tudo que não seja número ou vírgula
   const somenteNumeros = valor.replace(/[^0-9,]/g, '');
-  // Troca vírgula por ponto para parseFloat
   const valorPonto = somenteNumeros.replace(',', '.');
   return parseFloat(valorPonto) || 0;
 };
@@ -76,22 +68,19 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
     });
   };
 
-  // Função para controlar input de preço e taxa com máscara
   const handleChangeMoeda = (
     e: React.ChangeEvent<HTMLInputElement>,
     setFunc: React.Dispatch<React.SetStateAction<string>>
   ) => {
-    const valor = e.target.value;
-    // Remove "R$ " e formata
-    const valorSemPrefixo = valor.replace(/^R\$\s?/, '');
-    const valorFormatado = formatarMoedaBRL(valorSemPrefixo);
+    const valor = e.target.value.replace(/^R\$\s?/, '');
+    const valorFormatado = formatarMoedaBRL(valor);
     setFunc(valorFormatado);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="row g-4">
+    <form onSubmit={handleSubmit} className="row g-3">
       {/* Data */}
-      <div className="col-6">
+      <div className="col-12 col-md-6">
         <label className="form-label">Data</label>
         <input
           type="date"
@@ -103,9 +92,9 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
       </div>
 
       {/* Tipo */}
-      <div className="col-6">
+      <div className="col-12 col-md-6">
         <label className="form-label">Tipo</label>
-        <div className="btn-group w-100">
+        <div className="btn-group w-100 d-flex flex-wrap">
           {(['compra', 'venda'] as const).map((op) => (
             <React.Fragment key={op}>
               <input
@@ -127,7 +116,7 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
       </div>
 
       {/* Ticker */}
-      <div className="col-6">
+      <div className="col-12 col-md-6">
         <label className="form-label">Nome da Ação</label>
         <CreatableSelect
           options={options}
@@ -145,11 +134,6 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
           isClearable
           formatCreateLabel={(inputValue) => `Adicionar "${inputValue.toUpperCase()}"`}
           noOptionsMessage={() => 'Nenhum resultado'}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && ticker.trim() !== '') {
-              e.preventDefault();
-            }
-          }}
           menuPortalTarget={document.body}
           styles={{
             menuPortal: (base) => ({ ...base, zIndex: 9999 }),
@@ -158,7 +142,7 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
       </div>
 
       {/* Preço */}
-      <div className="col-6">
+      <div className="col-12 col-md-6">
         <label className="form-label">Preço</label>
         <input
           type="text"
@@ -171,7 +155,7 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
       </div>
 
       {/* Quantidade */}
-      <div className="col-6">
+      <div className="col-12 col-md-6">
         <label className="form-label">Quantidade</label>
         <div className="input-group">
           <button
@@ -200,7 +184,7 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
       </div>
 
       {/* Taxa de corretagem */}
-      <div className="col-6">
+      <div className="col-12 col-md-6">
         <label className="form-label">Taxa de Corretagem</label>
         <input
           type="text"
@@ -214,7 +198,7 @@ const FormOperacao: React.FC<Props> = ({ onAdd, tickersSugeridos }) => {
 
       {/* Botão */}
       <div className="col-12 text-end">
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary btn-ajustado">
           Adicionar
         </button>
       </div>
