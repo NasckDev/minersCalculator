@@ -25,7 +25,7 @@ npm install
 Execute o servidor de desenvolvimento:
 
 ```bash
-npm run dev
+npm run start
 ```
 Abra no navegador: http://localhost:300 (ou porta apontada no console)
 
